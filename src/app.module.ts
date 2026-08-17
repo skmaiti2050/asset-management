@@ -11,6 +11,7 @@ import { validateEnvironment } from './config/env.validation';
 import { AssetsModule } from './modules/assets/assets.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ClaimsModule } from './modules/claims/claims.module';
+import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -37,6 +38,7 @@ import { UsersModule } from './modules/users/users.module';
     AuthModule,
     AssetsModule,
     ClaimsModule,
+    HealthModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },
