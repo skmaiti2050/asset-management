@@ -8,6 +8,7 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { RequestLoggingInterceptor } from './common/interceptors/request-logging.interceptor';
 import { validateEnvironment } from './config/env.validation';
+import { AssetsModule } from './modules/assets/assets.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 
@@ -33,6 +34,7 @@ import { UsersModule } from './modules/users/users.module';
     }),
     UsersModule,
     AuthModule,
+    AssetsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },
