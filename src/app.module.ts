@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -32,6 +33,17 @@ import { UsersModule } from './modules/users/users.module';
         autoLoadEntities: true,
         migrations: [join(__dirname, 'database/migrations/*{.ts,.js}')],
         synchronize: false,
+      }),
+    }),
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: configService.getOrThrow<number>('THROTTLE_TTL') * 1000,
+            limit: configService.getOrThrow<number>('THROTTLE_LIMIT'),
+          },
+        ],
       }),
     }),
     UsersModule,
