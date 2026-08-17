@@ -9,9 +9,10 @@ import {
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { AuthenticatedUser } from '../../common/types/authenticated-user';
-import { AuthService, UserProfile } from './auth.service';
+import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UserProfile } from './interfaces/auth.interface';
 
 @Controller('auth')
 export class AuthController {

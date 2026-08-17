@@ -10,6 +10,7 @@ import { RequestLoggingInterceptor } from './common/interceptors/request-logging
 import { validateEnvironment } from './config/env.validation';
 import { AssetsModule } from './modules/assets/assets.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ClaimsModule } from './modules/claims/claims.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -35,6 +36,7 @@ import { UsersModule } from './modules/users/users.module';
     UsersModule,
     AuthModule,
     AssetsModule,
+    ClaimsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },
