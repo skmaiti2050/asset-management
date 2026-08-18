@@ -1,98 +1,143 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Asset Management API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Production-oriented REST API for authenticated users to manage assets (coupons/vouchers): create, claim, release, and audit with concurrency-safe claim/release semantics and full claim history.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Stack
 
-## Description
+- NestJS 11, TypeORM 1.1, PostgreSQL 17 (>= 14, uses `gen_random_uuid`)
+- TypeScript 6, Node.js 24 LTS
+- JWT auth (HS256) + bcrypt password hashing, role-based access (member / admin)
+- Zod env validation, helmet, global rate limiting, Terminus health checks
+- Swagger OpenAPI documentation, Docker multi-stage builds
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Requirements
 
-## Project setup
+- Node.js >= 24 (LTS), PostgreSQL >= 14
+- Create the databases (or set `DATABASE_NAME` in `.env`):
 
-```bash
-$ npm install
+```sql
+CREATE DATABASE asset_management;
+CREATE DATABASE asset_management_test;
 ```
 
-## Compile and run the project
+## Setup
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
+cp .env.example .env   # then fill in credentials
 ```
 
-## Run tests
+## Migrations
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run migration:run    # applies pending migrations to the DATABASE_NAME database
+npm run migration:revert # reverts the last batch
 ```
 
-## Deployment
+The app never auto-syncs the schema (`synchronize: false`); the schema is applied via migrations.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Run
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev   # watch mode (http://localhost:4000)
+npm run build       # compile
+npm run start:prod  # run compiled dist
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Docker
 
-## Resources
+A multi-stage `Dockerfile` and a `docker-compose.yml` are provided. Compose runs the app together with a PostgreSQL 17 container (DB data persisted in a named volume); the app's migrations run automatically on startup.
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+# one command: builds the image, starts Postgres + app
+docker compose up -d --build
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# verify
+curl http://localhost:4000/api/v1/health
 
-## Support
+# stop
+docker compose down
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Or build and run the image manually. To run against the local database from `.env`, use Docker Desktop's host alias - inside a container `localhost` refers to the container itself, not your machine:
 
-## Stay in touch
+```bash
+docker build -t asset-management .
+docker run -p 4001:4000 --env-file .env -e DATABASE_HOST=host.docker.internal asset-management
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+> `DATABASE_PORT`/`DATABASE_PASSWORD` come from `.env`; map to a free host port (e.g. `4001`) if `4000` is already in use.
 
-## License
+## Tests
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+npm run test        # unit tests (18)
+npm run test:e2e    # e2e, incl. concurrency race tests (15), uses asset_management_test
+npm run lint        # eslint + prettier
+```
+
+## API
+
+All routes under `/api/v1`. Everything except `POST /auth/register`, `POST /auth/login`, and `GET /health` requires `Authorization: Bearer <token>`.
+
+> **Swagger UI**: When running locally, interactive API documentation is available at `http://localhost:4000/docs`.
+
+> **Roles**: Everyone registers as `member`. To become `admin` (for `POST/PATCH /assets`), call `PATCH /auth/role` with the shared `ROLE_CHANGE_SECRET` from `.env` - it returns a fresh token carrying the new role.
+
+### Authentication
+
+| Method | Path             | Auth   | Description                     |
+| ------ | ---------------- | ------ | ------------------------------- |
+| POST   | `/auth/register` | public | Create account, returns profile |
+| POST   | `/auth/login`    | public | Returns `{ accessToken }`       |
+| GET    | `/auth/me`       | JWT    | Current user profile            |
+| PATCH  | `/auth/role`     | JWT    | Change own role via `ROLE_CHANGE_SECRET`, returns a fresh token |
+
+### Assets
+
+| Method | Path                  | Auth  | Description                                       |
+| ------ | --------------------- | ----- | ------------------------------------------------- |
+| GET    | `/assets/pool`        | JWT   | Pool summary (`total/available/claimed/expired`)   |
+| GET    | `/assets`             | JWT   | List assets (filter by `status`, paginated)        |
+| GET    | `/assets/:id`         | JWT   | Single asset detail                                |
+| POST   | `/assets`             | admin | Bulk-create assets by code (`{ "codes": [] }`)     |
+| PATCH  | `/assets/:id`         | admin | Update `expiresAt` (optimistic lock via `version`) |
+| POST   | `/assets/:id/claim`   | JWT   | Claim a specific asset (409 if taken)              |
+| POST   | `/assets/claim-any`   | JWT   | Claim any available asset                          |
+| POST   | `/assets/:id/release` | JWT   | Release an asset claimed by you (403 otherwise)    |
+
+### User History
+
+| Method | Path          | Auth | Description                                        |
+| ------ | ------------- | ---- | -------------------------------------------------- |
+| GET    | `/me/history` | JWT  | Your claim/release history (joined user/asset data) |
+| GET    | `/me/assets`  | JWT  | Assets you currently hold                           |
+
+### Infrastructure
+
+| Method | Path      | Auth   | Description              |
+| ------ | --------- | ------ | ------------------------ |
+| GET    | `/health` | public | DB liveness via Terminus |
+
+## Concurrency Model
+
+The system handles race conditions at the database level - no application-level locks, no Redis.
+
+- **Claim a specific asset**: single atomic `UPDATE ... WHERE status = 'available' RETURNING` inside a transaction. Only one concurrent caller can transition the row; the rest see 0 affected rows and get `409 Conflict`.
+- **Claim any available**: `SELECT ... FOR UPDATE SKIP LOCKED` picks a free row without blocking concurrent requests, then the same atomic update applies. Each concurrent call grabs a different row.
+- **Release**: atomic `UPDATE ... WHERE status = 'claimed' AND claimed_by = $userId`. Only the claimant can release.
+- **Admin update**: optimistic locking - `PATCH` requires the current `version`; a stale `version` yields `409`.
+- **Unique `code`** on assets prevents duplicates (mapped to `409`).
+
+Every claim/release is recorded in the `claims` ledger table for full audit history.
+
+## Project Layout
+
+```
+src/
+  common/       guards, exception filter, interceptors, DTOs, types
+  config/       env validation (Zod)
+  database/     DataSource + migrations
+  modules/      auth, users, assets, claims, health
+test/           e2e specs + shared test app helper
+```
