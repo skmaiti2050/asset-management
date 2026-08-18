@@ -33,6 +33,10 @@ import { UsersModule } from './modules/users/users.module';
         autoLoadEntities: true,
         migrations: [join(__dirname, 'database/migrations/*{.ts,.js}')],
         synchronize: false,
+        ssl:
+          configService.get('NODE_ENV') === 'production'
+            ? { rejectUnauthorized: false }
+            : false,
       }),
     }),
     ThrottlerModule.forRootAsync({
