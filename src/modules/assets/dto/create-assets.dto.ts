@@ -5,8 +5,17 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAssetsDto {
+  @ApiProperty({
+    description:
+      'Asset codes to create (3-64 chars: uppercase letters, digits, _ or -)',
+    example: ['ASSET-0001', 'ASSET-0002'],
+    type: [String],
+    minItems: 1,
+    maxItems: 1000,
+  })
   @IsArray()
   @ArrayNotEmpty()
   @ArrayMaxSize(1000)

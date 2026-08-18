@@ -9,14 +9,11 @@ import { DataSource, EntityManager, Repository } from 'typeorm';
 import { ClaimAction } from '../claims/claim-action.enum';
 import { Claim } from '../claims/entities/claim.entity';
 import { AssetStatus } from './asset-status.enum';
+import { AssetListItem } from './dto/asset-list-item.dto';
+import { ClaimedAsset } from './dto/claimed-asset.dto';
+import { PoolState } from './dto/pool-state.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
-import { Asset } from './entities/asset.entity';
-import {
-  AssetListItem,
-  ClaimedAsset,
-  PoolState,
-  UpdateRow,
-} from './interfaces/assets.interface';
+import { Asset, AssetRow } from './entities/asset.entity';
 
 @Injectable()
 export class AssetsService {
@@ -132,7 +129,7 @@ export class AssetsService {
         .returning(['id', 'code', 'status', 'claimedAt', 'version'])
         .execute();
 
-      const raw = result.raw as UpdateRow[];
+      const raw = result.raw as AssetRow[];
       if (!raw?.length) {
         await this.ensureReleaseable(manager, assetId, userId);
         throw new ConflictException('Asset is not claimed by you');
@@ -174,7 +171,7 @@ export class AssetsService {
       .returning(['id', 'code', 'status', 'claimedAt', 'version'])
       .execute();
 
-    const raw = result.raw as UpdateRow[];
+    const raw = result.raw as AssetRow[];
     if (!raw?.length) {
       return null;
     }
@@ -287,7 +284,7 @@ export class AssetsService {
     };
   }
 
-  private toClaimedAsset(raw: UpdateRow): ClaimedAsset {
+  private toClaimedAsset(raw: AssetRow): ClaimedAsset {
     return {
       id: raw.id,
       code: raw.code,

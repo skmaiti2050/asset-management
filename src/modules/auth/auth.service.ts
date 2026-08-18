@@ -12,7 +12,7 @@ import { UsersService } from '../users/users.service';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { UserProfile } from './interfaces/auth.interface';
+import { UserProfile } from './dto/user-profile.dto';
 
 @Injectable()
 export class AuthService {

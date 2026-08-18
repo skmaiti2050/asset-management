@@ -5,8 +5,8 @@ import { AssetStatus } from '../assets/asset-status.enum';
 import { Asset } from '../assets/entities/asset.entity';
 import { User } from '../users/entities/user.entity';
 import { ClaimAction } from './claim-action.enum';
+import { HistoryItem } from './dto/history-item.dto';
 import { Claim } from './entities/claim.entity';
-import { HistoryItem, HistoryRow } from './interfaces/claims.interface';
 
 @Injectable()
 export class ClaimsService {
@@ -41,7 +41,7 @@ export class ClaimsService {
     }
 
     const [items, total] = await Promise.all([
-      query.clone().skip(skip).take(limit).getRawMany<HistoryRow>(),
+      query.clone().skip(skip).take(limit).getRawMany<HistoryItem>(),
       query.getCount(),
     ]);
 

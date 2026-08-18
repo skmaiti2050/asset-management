@@ -8,6 +8,14 @@ import {
 } from 'typeorm';
 import { AssetStatus } from '../asset-status.enum';
 
+export interface AssetRow {
+  id: string;
+  code: string;
+  status: AssetStatus;
+  claimed_at: Date | null;
+  version: number;
+}
+
 @Entity('assets')
 @Index('IDX_assets_status', ['status'])
 @Index('IDX_assets_claimed_by', ['claimedBy'])
