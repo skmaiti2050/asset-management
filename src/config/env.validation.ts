@@ -15,6 +15,8 @@ export const envSchema = z.object({
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES_IN: z.string().default('15m'),
 
+  ROLE_CHANGE_SECRET: z.string().min(8),
+
   BCRYPT_ROUNDS: z.coerce.number().min(10).max(15).default(12),
 
   CORS_ORIGINS: z.string().default(''),

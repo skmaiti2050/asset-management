@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { AuthenticatedUser } from '../../common/types/authenticated-user';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { ChangeRoleDto } from './dto/change-role.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UserProfile } from './interfaces/auth.interface';
@@ -56,6 +57,23 @@ export class AuthService {
 
   private toJwtPayload(user: User): AuthenticatedUser {
     return { id: user.id, email: user.email, role: user.role };
+  }
+
+  async changeRole(
+    userId: string,
+    dto: ChangeRoleDto,
+  ): Promise<{ accessToken: string }> {
+    const roleChangeSecret =
+      this.configService.getOrThrow<string>('ROLE_CHANGE_SECRET');
+    if (dto.secret !== roleChangeSecret) {
+      throw new UnauthorizedException('Invalid secret');
+    }
+
+    const user = await this.usersService.updateRole(userId, dto.role);
+    const accessToken = await this.jwtService.signAsync(
+      this.toJwtPayload(user),
+    );
+    return { accessToken };
   }
 
   private toProfile(user: User): UserProfile {
